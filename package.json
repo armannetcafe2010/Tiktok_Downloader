@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "description": "TikTok Video Downloader API using Puppeteer",
-  "main": "tiktok.mjs",
+  "main": "tiktok.js",
   "scripts": {
     "start": "node tiktok.js"
   },
