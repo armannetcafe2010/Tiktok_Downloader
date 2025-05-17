@@ -1,10 +1,11 @@
 {
   "name": "tiktok-downloader",
   "version": "1.0.0",
+  "type": "module",
   "description": "TikTok Video Downloader API using Puppeteer",
-  "main": "server.js",
+  "main": "tiktok.mjs",
   "scripts": {
-    "start": "node tiktok.js"
+    "start": "node tiktok.mjs"
   },
   "author": "Arman Niazi",
   "license": "MIT",
