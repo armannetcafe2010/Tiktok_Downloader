@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "express": "^4.19.0",
+    "puppeteer": "^20.9.0",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-stealth": "^2.11.1"
   }
