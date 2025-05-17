@@ -1,14 +1,18 @@
 {
-  "name": "tiktok-downloader-api",
+  "name": "tiktok-downloader",
   "version": "1.0.0",
-  "description": "Offline TikTok downloader API using Puppeteer and Node.js",
-  "main": "tiktok.js",
+  "description": "TikTok Video Downloader API using Puppeteer",
+  "main": "server.js",
   "scripts": {
-    "start": "node tiktok.js"
+    "start": "node server.js"
   },
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-stealth": "^2.11.1"
-  }
+  },
+  "devDependencies": {},
+  "keywords": []
 }
