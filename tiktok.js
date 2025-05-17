@@ -6,7 +6,7 @@ const path = require('path');
 const https = require('https');
 const http = require('http');
 
-// Apply stealth plugin
+// Apply stealth plugin to puppeteer-extra
 puppeteer.use(StealthPlugin());
 
 const app = express();
@@ -43,6 +43,7 @@ function downloadVideoFile(url, outputPath) {
       response.pipe(file);
       file.on('finish', () => file.close(() => resolve(outputPath)));
     }).on('error', (err) => {
+      // Delete partially downloaded file
       fs.unlink(outputPath, () => reject(err));
     });
   });
@@ -52,7 +53,7 @@ app.get('/download', async function (req, res) {
   const inputUrl = req.query.url;
   const noWatermark = req.query.nowm === 'true';
 
-  if (!inputUrl || inputUrl.indexOf('tiktok.com') === -1) {
+  if (!inputUrl || !inputUrl.includes('tiktok.com')) {
     return res.status(400).json({ error: 'Invalid or missing TikTok URL' });
   }
 
@@ -69,6 +70,7 @@ app.get('/download', async function (req, res) {
       '--disable-gpu',
       '--window-size=375,667'
     ];
+
     if (proxyServer) launchArgs.push('--proxy-server=' + proxyServer);
 
     browser = await puppeteer.launch({
@@ -79,28 +81,29 @@ app.get('/download', async function (req, res) {
 
     const page = await browser.newPage();
 
-    // Spoof mobile device
+    // Spoof mobile device user-agent
     await page.setUserAgent(
       'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) ' +
       'AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
     );
+
     await page.setViewport({ width: 375, height: 667, isMobile: true });
 
-    // Visit TikTok page
+    // Navigate to TikTok video URL
     await page.goto(finalUrl, { waitUntil: 'domcontentloaded', timeout: 90000 });
 
-    // Wait for video to be ready
+    // Wait for video element
     await page.waitForSelector('video', { timeout: 30000 });
 
-    // Extract video source URL
-    const videoSrc = await page.evaluate(function () {
-      var video = document.querySelector('video');
+    // Extract video source URL from DOM or __NEXT_DATA__
+    const videoSrc = await page.evaluate(() => {
+      const video = document.querySelector('video');
       if (video && video.src) return video.src;
 
       try {
-        var script = document.getElementById('__NEXT_DATA__');
+        const script = document.getElementById('__NEXT_DATA__');
         if (!script) return null;
-        var json = JSON.parse(script.textContent);
+        const json = JSON.parse(script.textContent);
 
         if (
           json &&
@@ -111,25 +114,26 @@ app.get('/download', async function (req, res) {
           json.props.pageProps.videoData.itemInfo.itemStruct &&
           json.props.pageProps.videoData.itemInfo.itemStruct.video
         ) {
-          if (json.props.pageProps.videoData.itemInfo.itemStruct.video.playAddr) {
-            return json.props.pageProps.videoData.itemInfo.itemStruct.video.playAddr;
-          }
+          return json.props.pageProps.videoData.itemInfo.itemStruct.video.playAddr || null;
         }
-      } catch (e) {
+      } catch {
         return null;
       }
 
       return null;
     });
 
-    if (!videoSrc || videoSrc.indexOf('http') === -1) {
+    if (!videoSrc || !videoSrc.startsWith('http')) {
       throw new Error('Could not retrieve video source');
     }
 
+    // Create file path to save video
     const fileName = 'tiktok_' + Date.now() + (noWatermark ? '_nowm' : '_wm') + '.mp4';
     const outputPath = path.join(__dirname, fileName);
 
+    // Download video file locally
     await downloadVideoFile(videoSrc, outputPath);
+
     await browser.close();
 
     return res.json({
@@ -148,6 +152,6 @@ app.get('/download', async function (req, res) {
   }
 });
 
-app.listen(PORT, function () {
+app.listen(PORT, () => {
   console.log('🚀 Server is running at: http://localhost:' + PORT);
 });
