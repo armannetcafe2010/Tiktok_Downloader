@@ -6,20 +6,18 @@
   "scripts": {
     "start": "node server.js"
   },
-  "author": "Your Name",
+  "author": "Arman Niazi",
   "license": "MIT",
   "type": "module",
   "keywords": [
     "tiktok",
     "downloader",
     "puppeteer",
-    "express",
-    "nowm"
+    "express"
   ],
   "dependencies": {
     "express": "^4.19.0",
-    "puppeteer-extra": "^3.4.3",
-    "puppeteer-extra-plugin-stealth": "^2.12.0"
-  },
-  "devDependencies": {}
+    "puppeteer-extra": "^3.3.4",
+    "puppeteer-extra-plugin-stealth": "^2.11.1"
+  }
 }
