@@ -1,12 +1,15 @@
-const express = require('express');
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
-const http = require('http');
+import express from 'express';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import http from 'http';
+import { fileURLToPath } from 'url';
 
-// Apply stealth plugin to puppeteer-extra
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 puppeteer.use(StealthPlugin());
 
 const app = express();
